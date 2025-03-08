@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestational Age Calculator</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Helvetica Neue', sans-serif;
+    }
+    .calculator {
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+      margin-top: 50px;
+    }
+    .calculator h2 {
+      color: #007bff;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    .calculator label {
+      font-weight: bold;
+      color: #333;
+    }
+    .calculator input {
+      margin-bottom: 15px;
+    }
+    .calculator button {
+      background-color: #007bff;
+      border: none;
+      width: 100%;
+      padding: 10px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .calculator button:hover {
+      background-color: #0056b3;
+    }
+    .result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      color: #28a745;
+    }
+    .dark-mode {
+      background-color: #121212;
+      color: #ffffff;
+    }
+    .dark-mode .calculator {
+      background-color: #1e1e1e;
+      color: #ffffff;
+    }
+    .dark-mode label {
+      color: #ffffff;
+    }
+    .dark-mode input {
+      background-color: #333;
+      color: #ffffff;
+      border-color: #555;
+    }
+    .dark-mode button {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="calculator">
+        <h2 class="text-center">গর্ভধারণের সময়কাল ক্যালকুলেটর</h2>
+        <form id="gestationalForm">
+          <div class="mb-3">
+            <label for="lmpDate" class="form-label">শেষ মাসিকের তারিখ (LMP):</label>
+            <input type="date" class="form-control" id="lmpDate" required>
+          </div>
+          <div class="mb-3">
+            <label for="currentDate" class="form-label">বর্তমান তারিখ:</label>
+            <input type="date" class="form-control" id="currentDate" required>
+          </div>
+          <div class="mb-3">
+            <label for="ultrasoundDate" class="form-label">আল্ট্রাসাউন্ড তারিখ (যদি থাকে):</label>
+            <input type="date" class="form-control" id="ultrasoundDate">
+          </div>
+          <button type="submit" class="btn btn-primary">হিসাব করুন</button>
+        </form>
+        <div class="result text-center mt-4" id="result"></div>
+        <button id="darkModeToggle" class="btn btn-secondary mt-3">ডার্ক মোড টগল করুন</button>
+        <button id="printResult" class="btn btn-info mt-3">ফলাফল প্রিন্ট করুন</button>
+        <button id="shareResult" class="btn btn-success mt-3">ফলাফল শেয়ার করুন</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Custom JavaScript -->
+<script>
+  document.getElementById('gestationalForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Form submission prevent
+
+    // Get input values
+    const lmpDate = new Date(document.getElementById('lmpDate').value);
+    const currentDate = new Date(document.getElementById('currentDate').value);
+    const ultrasoundDate = new Date(document.getElementById('ultrasoundDate').value);
+
+    // Date Validation
+    if (lmpDate > currentDate) {
+      alert('শেষ মাসিকের তারিখ বর্তমান তারিখের চেয়ে বেশি হতে পারে না।');
+      return;
+    }
+
+    // Calculate difference in days
+    const timeDifference = currentDate - lmpDate;
+    const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+
+    // Convert days to weeks and days
+    const weeks = Math.floor(daysDifference / 7);
+    const days = daysDifference % 7;
+
+    // Calculate Estimated Due Date (EDD)
+    const edd = new Date(lmpDate);
+    edd.setDate(edd.getDate() + 280); // 40 weeks = 280 days
+
+    // Calculate Trimester
+    let trimester = '';
+    if (weeks < 13) {
+      trimester = '১ম Trimester';
+    } else if (weeks >= 13 && weeks < 27) {
+      trimester = '২য় Trimester';
+    } else {
+      trimester = '৩য় Trimester';
+    }
+
+    // Pregnancy Milestones
+    let milestone = '';
+    if (weeks === 12) {
+      milestone = 'এই সপ্তাহে শিশুর হার্টবিট শোনা যায়।';
+    } else if (weeks === 20) {
+      milestone = 'এই সপ্তাহে শিশুর লিঙ্গ জানা যায়।';
+    } else if (weeks === 36) {
+      milestone = 'এই সপ্তাহে শিশুর পূর্ণ বিকাশ হয়।';
+    }
+
+    // Ultrasound date calculation
+    let ultrasoundResult = '';
+    if (ultrasoundDate) {
+      const ultrasoundDifference = currentDate - ultrasoundDate;
+      const ultrasoundDaysDifference = Math.floor(ultrasoundDifference / (1000 * 60 * 60 * 24));
+      const ultrasoundWeeks = Math.floor(ultrasoundDaysDifference / 7);
+      const ultrasoundDays = ultrasoundDaysDifference % 7;
+      ultrasoundResult = `<br><strong>আল্ট্রাসাউন্ড অনুযায়ী সময়কাল: ${toBengaliNumber(ultrasoundWeeks)} সপ্তাহ ${toBengaliNumber(ultrasoundDays)} দিন</strong>`;
+    }
+
+    // Display result
+    const resultElement = document.getElementById('result');
+    resultElement.innerHTML = `
+      গর্ভধারণের সময়কাল: <strong>${toBengaliNumber(weeks)} সপ্তাহ ${toBengaliNumber(days)} দিন</strong><br>
+      সম্ভাব্য প্রসবের তারিখ: <strong>${edd.toLocaleDateString()}</strong><br>
+      Trimester: <strong>${trimester}</strong><br>
+      ${milestone ? `মাইলস্টোন: <strong>${milestone}</strong><br>` : ''}
+      ${ultrasoundResult}
+    `;
+  });
+
+  // Dark Mode Toggle
+  document.getElementById('darkModeToggle').addEventListener('click', function() {
+    document.body.classList.toggle('dark-mode');
+  });
+
+  // Print Result
+  document.getElementById('printResult').addEventListener('click', function() {
+    window.print();
+  });
+
+  // Share Result
+  document.getElementById('shareResult').addEventListener('click', function() {
+    const resultText = document.getElementById('result').innerText;
+    if (navigator.share) {
+      navigator.share({
+        title: 'Gestational Age Calculator',
+        text: resultText,
+      });
+    } else {
+      alert('শেয়ার অপশন আপনার ডিভাইসে সাপোর্ট করে না।');
+    }
+  });
+
+  // Bengali Number Converter
+  const bengaliNumbers = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+  function toBengaliNumber(number) {
+    return number.toString().split('').map(digit => bengaliNumbers[digit] || digit).join('');
+  }
+</script>
+
+</body>
+</html>
